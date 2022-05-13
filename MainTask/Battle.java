@@ -10,7 +10,7 @@ public class Battle {
 	int pl_mon_HP = 0;
 	int en_mon_HP = 0;
 	
-	
+	//í“¬‚Ìƒtƒ[‚É‚Â‚¢‚Ä‚Í‘S•”‚±‚±‚É‘‚­
 	public static void main(String[] args){
 		Battle battle = new Battle();
 		Scanner sc = new Scanner(System.in);
