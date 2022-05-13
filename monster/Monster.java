@@ -5,16 +5,18 @@ public class Monster {
 	private String name;
 	private int hp;
 	private int power;
+	private int speed;
 	
 	//コンストラクタ
 	public Monster(){
 		
 	}
 	
-	public Monster(String name,int hp,int power){
+	public Monster(String name,int hp,int power ,int speed){
 		this.name = name;
 		this.hp = hp;
 		this.power = power;
+		this.speed = speed;
 	}
 	
 	//メソッド
@@ -33,6 +35,10 @@ public class Monster {
 	
 	public int getPower(){
 		return power;
+	}
+	
+	public int getSpeed(){
+		return speed;
 	}
 	
 }
