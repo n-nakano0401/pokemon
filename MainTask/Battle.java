@@ -3,12 +3,12 @@ import java.util.*;
 import monster.Monster;
 
 public class Battle {
-	String pl_name = "まえだ";
-	String en_name = "いまにし";
-	String justNext;
+	private String pl_name = "まえだ";
+	private String en_name = "いまにし";
+	private UImanager ui;
 	
-	int pl_mon_HP = 0;
-	int en_mon_HP = 0;
+	private int pl_mon_HP = 0;
+	private int en_mon_HP = 0;
 	
 	//戦闘時のフローについては全部ここに書く
 	public static void main(String[] args){
@@ -19,50 +19,30 @@ public class Battle {
 		Monster pl_mon = new Monster("ピカチュウ",60,15);
 		Monster en_mon = new Monster("フシギダネ",50,10);
 		
-		
-		//口上
-		System.out.println("ポケモントレーナーの"+ battle.en_name +"がしょうぶをしかけてきた！▼(Enterで進みます)");
-		battle.justNext = sc.nextLine();
+		//コマンドライン上の演出はuiで"すべて"管理する
+		battle.ui = new UImanager(battle.pl_name, battle.en_name, pl_mon.getName(),en_mon.getName());
 		
 		//一番先頭にいるポケモンを出す(敵も味方も)
 		battle.setBattleHP(pl_mon.getHp(),en_mon.getHp());
-		
-		System.out.println("あいては"+ en_mon.getName() +"をくりだした！▼(Enterで進みます)");
-		battle.justNext = sc.nextLine();
-		System.out.println("いけ！"+ pl_mon.getName() +"！▼(Enterで進みます)");
-		battle.justNext = sc.nextLine();
+		battle.ui.battleEntry();
 
 		//バトルループ
 		while(battle.pl_mon_HP>0){
-			System.out.println("| " + battle.en_mon_HP + "/" + en_mon.getHp() +" |" +en_mon.getName());
-			System.out.println("");
-			System.out.println(pl_mon.getName() +"| " + battle.pl_mon_HP + "/" + pl_mon.getHp() +" |");
-			
-			System.out.println("-------------------");
-			System.out.println(pl_mon.getName() + "はどうする？(1~4の数字を入力)");
-			System.out.println("-------------------");
-			System.out.println("1:たたかう 2:どうぐ");
-			System.out.println("3:ポケモン 4:にげる");
-			System.out.println("-------------------");
-
+			battle.ui.battleVisual(battle.pl_mon_HP, pl_mon.getHp(), battle.en_mon_HP, en_mon.getHp());
 			String menuchoice = sc.next();
 			
 			//選択
 			if(menuchoice.matches("[+-]?\\d*(\\.\\d+)?")){
 				if(menuchoice.equals("1")){
-					System.out.println(pl_mon.getName() + "のこうげき！");
-					System.out.println(en_mon.getName() + "に" + pl_mon.getPower() +"のダメージ！");
+					battle.ui.attack(0,pl_mon.getPower());
 					//技を選択し、ダメージの処理をする
 					battle.en_mon_HP = battle.en_mon_HP - pl_mon.getPower();
 				}else if(menuchoice.equals("2")){
-					System.out.println(pl_mon.getName() + "はどうぐにはたよらないいしをしめした！");					
+					battle.ui.useItem();					
 				}else{
-					System.out.println("たたかうこといがいはできない！");
+					battle.ui.tempMessage();
 				}
-				
-				
-				
-			}else{System.out.println("数字を入力してください");}
+			}else{battle.ui.inputException();}
 			
 			System.out.println("");
 			//このとき敵HPが0になったら戦闘終了である
@@ -73,7 +53,6 @@ public class Battle {
 			battle.winCheck(pl_mon.getName(),en_mon.getName());
 			System.out.println("");
 		}
-		
 	}
 	
 	//バトルで使用するHPの設定
@@ -86,30 +65,18 @@ public class Battle {
 	public void winCheck(String pl_mon, String en_mon){
 		Scanner sc = new Scanner(System.in);
 		if(pl_mon_HP <= 0){
-			System.out.println(pl_mon + "はたおれた！▼(Enterで進みます)");
-			justNext = sc.nextLine();
-			System.out.println(pl_name + "は" + en_name + "にやぶれた▼(Enterで進みます)");
-			justNext = sc.nextLine();
-			System.out.println("めのまえがまっくらになった▼(Enterで進みます)");
-			justNext = sc.nextLine();
+			ui.loseMessage();
 			System.exit(0);
 
 		}else if(en_mon_HP <= 0){
-			System.out.println(en_mon + "はたおれた！▼(Enterで進みます)");
-			justNext = sc.nextLine();
-			System.out.println(pl_name + "は" + en_name + "にかった！▼(Enterで進みます)");
-			justNext = sc.nextLine();
-			System.out.println("うれしいきもちになった！▼(Enterで進みます)");
-			justNext = sc.nextLine();
+			ui.winMessage();
 			System.exit(0);
 		}
-
 	}
 	
 	//敵の思考ルーチン
 	public void enemyTactics(String pl_mon, String en_mon, int enPower){
-		System.out.println(en_mon + "のこうげき！");
-		System.out.println(pl_mon + "に" + enPower +"のダメージ！");
+		ui.attack(1,enPower);
 		pl_mon_HP = pl_mon_HP - enPower;
 	}
 }
