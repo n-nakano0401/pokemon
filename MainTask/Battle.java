@@ -1,82 +1,109 @@
 package MainTask;
 import java.util.*;
 import monster.Monster;
+import monster.Trainer;
 
 public class Battle {
+	
+	//フィールド
 	private Random rand = new Random();
 	
-	private String pl_name = "まえだ";
-	private String en_name = "いまにし";
+	private Trainer pl;
+	private Trainer en;
+	
+	private String pl_name;
+	private String en_name;
 	private UImanager ui;
 	
 	private int pl_mon_HP = 0;
 	private int en_mon_HP = 0;
 	private int first = 0;//先手をどちらがとるか判定
 	
+	//コンストラクタ
+	public Battle(){}
+	
+	public Battle(Trainer pl,Trainer en){
+		this.pl = pl;
+		this.en = en;
+	}
+	
 	//戦闘時のフローについては全部ここに書く
-	public static void main(String[] args){
+	public boolean battle(){
 		//-----------------変数の設定-----------------
 		//仕様上の処理
-		Battle battle = new Battle();
+		//Battle battle = new Battle();
 		Scanner sc = new Scanner(System.in);
 
-		//プレイヤーのポケモンを参照(敵も味方も)
-		Monster pl_mon = new Monster("ピカチュウ",60,15,30);
-		Monster en_mon = new Monster("フシギダネ",50,10,20);
+		//プレイヤーとポケモンを参照(敵も味方も)
+		pl_name = pl.getName();
+		en_name = en.getName();
+		Monster pl_mon = pl.getPokemon();
+		Monster en_mon = en.getPokemon();
 		
 		//コマンドライン上の演出はuiで"すべて"管理する
-		battle.ui = new UImanager(battle.pl_name, battle.en_name, pl_mon.getName(),en_mon.getName());
+		ui = new UImanager(pl_name, en_name, pl_mon.getName(),en_mon.getName());
 		
 		
 		//------------------ここから処理-------------------
 		//一番先頭にいるポケモンを出す(敵も味方も)
-		battle.setBattleHP(pl_mon.getHp(),en_mon.getHp());
-		battle.ui.battleEntry();
+		setBattleHP(pl_mon.getHp(),en_mon.getHp());
+		ui.battleEntry();
 
 		//バトルループ
-		while(battle.pl_mon_HP>0){
-			battle.ui.battleVisual(battle.pl_mon_HP, pl_mon.getHp(), battle.en_mon_HP, en_mon.getHp());
+		while(pl_mon_HP>0){
+			ui.battleVisual(pl_mon_HP, pl_mon.getHp(), en_mon_HP, en_mon.getHp());
 			String menuchoice = sc.next();
 
 			
 			//選択
 			if(menuchoice.matches("[+-]?\\d*(\\.\\d+)?")){
 				//どちらが先手をとれるか判定する
-				battle.first = battle.firstMoveSetter(pl_mon.getSpeed(),en_mon.getSpeed());
+				first = firstMoveSetter(pl_mon.getSpeed(),en_mon.getSpeed());
 
 				if(menuchoice.equals("1")){
-					if(battle.first == 0){
-						battle.ui.attack(0,pl_mon.getPower());
+					if(first == 0){
+						ui.attack(0,pl_mon.getPower());
 						//技を選択し、ダメージの処理をする
-						battle.en_mon_HP = battle.en_mon_HP - pl_mon.getPower();
-					}else if(battle.first == 1){
-						battle.enemyTactics(pl_mon.getName(),en_mon.getName(),en_mon.getPower());
+						en_mon_HP = en_mon_HP - pl_mon.getPower();
+					}else if(first == 1){
+						enemyTactics(pl_mon.getName(),en_mon.getName(),en_mon.getPower());
 					}
 					
 				}else if(menuchoice.equals("2")){
-					battle.ui.useItem();
-					battle.first = 0;
+					ui.useItem();
+					first = 0;
 				}else{
-					battle.ui.tempMessage();
-					battle.first = 0;
+					ui.tempMessage();
+					first = 0;
 				}
-			}else{battle.ui.inputException();}
+			}else{ui.inputException();}
 			
 			System.out.println("");
 			//このとき敵HPが0になったら戦闘終了である
-			battle.winCheck(pl_mon.getName(),en_mon.getName());
+			int check1 = winCheck(pl_mon.getName(),en_mon.getName());
+			if(check1 == 0){
+				return false;
+			}else if(check1 == 1){
+				return true;
+			}
 			//敵のターン
-			if(battle.first == 1){
-				battle.ui.attack(0,pl_mon.getPower());
+			if(first == 1){
+				ui.attack(0,pl_mon.getPower());
 				//技を選択し、ダメージの処理をする
-				battle.en_mon_HP = battle.en_mon_HP - pl_mon.getPower();
-			}else if(battle.first == 0){
-				battle.enemyTactics(pl_mon.getName(),en_mon.getName(),en_mon.getPower());
+				en_mon_HP = en_mon_HP - pl_mon.getPower();
+			}else if(first == 0){
+				enemyTactics(pl_mon.getName(),en_mon.getName(),en_mon.getPower());
 			}
 			//このとき味方HPが0になったら戦闘終了である
-			battle.winCheck(pl_mon.getName(),en_mon.getName());
+			int check2 = winCheck(pl_mon.getName(),en_mon.getName());
+			if(check2 == 0){
+				return false;
+			}else if(check2 == 1){
+				return true;
+			}
 			System.out.println("");
 		}
+		return true;
 	}
 	
 	//バトルで使用するHPの設定
@@ -86,14 +113,15 @@ public class Battle {
 	}
 	
 	//終了処理
-	public void winCheck(String pl_mon, String en_mon){
+	public int winCheck(String pl_mon, String en_mon){
 		if(pl_mon_HP <= 0){
 			ui.loseMessage();
-			System.exit(0);
-
+			return 0;
 		}else if(en_mon_HP <= 0){
 			ui.winMessage();
-			System.exit(0);
+			return 1;
+		}else{
+			return 2;
 		}
 	}
 	
