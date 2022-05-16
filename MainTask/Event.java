@@ -21,13 +21,12 @@ public class Event {
 		System.out.println("");
 		System.out.println("それじゃあさっそく始めよう！レッツバトル！");
 		System.out.println("");
-
 		
 
 		for(int i=0; i<3; i++){
 			//バトルを呼び出すときにバトルにかかわるトレーナーを入力する
 			Trainer en = pl.randomTrainer();
-			Battle battle = new Battle(pl,pl);
+			Battle battle = new Battle(pl,en);
 			
 			boolean result = battle.battle();//バトルの処理（勝利か否かの結果を返す）
 			

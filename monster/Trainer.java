@@ -27,9 +27,9 @@ public class Trainer {
 	
 	//トレーナーを生成するメソッド
 	public Trainer randomTrainer(){
-		String r_name = random_name[rand.nextInt(rand.nextInt(random_name.length))];
-		String r_job = random_job[rand.nextInt(rand.nextInt(random_name.length))];
-		String r_phrase = random_phrase[rand.nextInt(rand.nextInt(random_name.length))];
+		String r_name = random_name[rand.nextInt(random_name.length)];
+		String r_job = random_job[rand.nextInt(random_job.length)];
+		String r_phrase = random_phrase[rand.nextInt(random_phrase.length)];
 		Monster r_pokemon = pokemane.getPokemon(rand.nextInt(pokemane.guideLength()));
 		
 		Trainer trainer = new Trainer(r_name,r_job,r_phrase,r_pokemon);
